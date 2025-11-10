@@ -73,10 +73,18 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/vehicles/:id", async (req, res) => {
+    app.get("/vehicles/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
       const objectId = new ObjectId(id);
       const result = await vehicleCollection.findOne({ _id: objectId });
+      res.send(result);
+    });
+
+    app.get("/my-vehicles", async (req, res) => {
+      const email = req.query.email;
+      const result = await vehicleCollection
+        .find({ userEmail: email })
+        .toArray();
       res.send(result);
     });
 
