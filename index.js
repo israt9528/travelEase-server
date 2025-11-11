@@ -121,6 +121,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/latest-vehicles", async (req, res) => {
+      const result = await vehicleCollection
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
