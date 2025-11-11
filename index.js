@@ -58,6 +58,7 @@ async function run() {
 
     const db = client.db("travelEase_db");
     const vehicleCollection = db.collection("travel-collection");
+    const bookingCollection = db.collection("booking-collection");
 
     app.get("/vehicles", async (req, res) => {
       const result = await vehicleCollection
@@ -103,6 +104,20 @@ async function run() {
       const { id } = req.params;
       const filter = { _id: new ObjectId(id) };
       const result = await vehicleCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    app.post("/my-bookings", verifyToken, async (req, res) => {
+      const data = req.body;
+      const result = await bookingCollection.insertOne(data);
+      res.send(result);
+    });
+
+    app.get("/my-bookings", verifyToken, async (req, res) => {
+      const email = req.query.email;
+      const result = await bookingCollection
+        .find({ bookedBy: email })
+        .toArray();
       res.send(result);
     });
 
