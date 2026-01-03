@@ -29,26 +29,17 @@ const client = new MongoClient(uri, {
 
 const verifyToken = async (req, res, next) => {
   const authorization = req.headers.authorization;
-
   if (!authorization) {
-    return res.status(401).send({
-      message: "unauthorized access: token not found",
-    });
+    res.status(401).send({ message: "unauthorized access: token not found" });
   }
-
   const token = authorization.split(" ")[1];
-
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    console.log("✅ Token verified:", decoded.email);
-
-    req.decoded = decoded; // optional but recommended
+    const decode = await admin.auth().verifyIdToken(token);
+    console.log("✅ Token verified:", decode.email);
     next();
   } catch (error) {
     console.error("❌ Token verification failed:", error.message);
-    return res.status(401).send({
-      message: "unauthorized access",
-    });
+    res.status(401).send({ message: "unauthorized access" });
   }
 };
 
