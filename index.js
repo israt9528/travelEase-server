@@ -54,7 +54,7 @@ const verifyToken = async (req, res, next) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const db = client.db("travelEase_db");
     const vehicleCollection = db.collection("travel-collection");
@@ -74,7 +74,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/vehicles/:id", verifyToken, async (req, res) => {
+    app.get("/vehicles/:id", async (req, res) => {
       const { id } = req.params;
       const objectId = new ObjectId(id);
       const result = await vehicleCollection.findOne({ _id: objectId });
@@ -109,6 +109,8 @@ async function run() {
 
     app.post("/my-bookings", verifyToken, async (req, res) => {
       const data = req.body;
+      console.log(data);
+
       const result = await bookingCollection.insertOne(data);
       res.send(result);
     });
@@ -117,7 +119,15 @@ async function run() {
       const email = req.query.email;
       const result = await bookingCollection
         .find({ bookedBy: email })
+        .sort({ bookedAt: -1 })
         .toArray();
+      res.send(result);
+    });
+
+    app.delete("/my-bookings/:id", verifyToken, async (req, res) => {
+      const { id } = req.params;
+      const filter = { _id: new ObjectId(id) };
+      const result = await bookingCollection.deleteOne(filter);
       res.send(result);
     });
 
@@ -131,7 +141,7 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
